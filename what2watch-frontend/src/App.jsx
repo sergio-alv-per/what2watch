@@ -1,77 +1,83 @@
 import { useState, useEffect } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
 import './App.css'
 
 function App() {
-  const [count, setCount] = useState(0)
-  const [items, setItems] = useState([])
+  const [films, setFilms] = useState([])
   const [message, setMessage] = useState('')
+  const [roomId, setRoomId] = useState('')
   const [ws, setWs] = useState(null)
 
   useEffect(() => {
-    fetch('http://localhost:8000/items').then(
-      (res) => res.json()
-      ).then((data) => {
-        setItems(data)
-      }
-      ).catch((err) => {
-        console.log(err)
-      }
-      )
+    fetch('http://localhost:8000/films')
+      .then((res) => res.json())
+      .then((data) => setFilms(data))
+      .catch((err) => console.log(err))
   }, [])
 
   useEffect(() => {
-    const ws = new WebSocket('ws://localhost:8000/ws')
-    ws.onopen = () => {
-      console.log('connected')
-    }
+    if (roomId) {
+      const ws = new WebSocket(`ws://localhost:8000/ws/${roomId}`)
+      ws.onopen = () => {
+        console.log('connected')
+      }
 
-    ws.onmessage = (e) => {
-      setMessage(e.data)
-    }
+      ws.onmessage = (e) => {
+        setMessage(e.data)
+      }
 
-    ws.onclose = () => {
-      console.log('disconnected')
+      ws.onclose = () => {
+        console.log('disconnected')
+      }
+      setWs(ws)
     }
-    setWs(ws)
-  }, [])
+  }, [roomId])
+
+  const createRoom = () => {
+    fetch('http://localhost:8000/rooms', { method: 'POST' })
+      .then((res) => res.json())
+      .then((data) => setRoomId(data.id))
+      .catch((err) => console.log(err))
+  }
+
+  const connectToRoom = (evt) => {
+    evt.preventDefault()
+    const roomId = evt.target[0].value
+    setRoomId(roomId)
+  }
 
   return (
     <>
-      <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
+      <h1>What2Watch</h1>
+
+      <h3>Backend items</h3>
       <ul>
         {
-        items
-        ? items.map((item) => (<li key={item.id}>{item.name}</li>))
-        : <li>no items</li>
+        films
+        ? films.map((film) => (<li key={film.id}>{film.name} - {film.poster}</li>))
+        : <li>No items received</li>
         }
       </ul>
-      <button onClick={() => ws.send(new Date().toLocaleTimeString())}>
-        send current time
-      </button>
-      <p>
-        {message}
-      </p>
+
+      <h3>Websockets test</h3>
+      <button onClick={createRoom}>Create room</button>
+      <form onSubmit={connectToRoom}>
+        <input type="text" placeholder="Room ID" />
+        <button type="submit" >Connect to room</button>
+      </form>
+      
+      <div>
+        {
+        ws
+        ? (
+        <>
+          <p>{roomId}</p>
+          <button onClick={() => ws.send('Hello!')}>Send message</button>
+          <p>{message}</p>
+        </>
+        )
+        : <p>Not connected</p>
+        }
+      </div>
     </>
   )
 }

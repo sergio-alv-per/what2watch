@@ -2,12 +2,12 @@ from typing import Union
 from fastapi import FastAPI, WebSocket
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
+import random
+import string
 
 app = FastAPI()
 
-origins = [
-    "http://localhost:5173"
-]
+origins = ["http://localhost:5173"] # Vite frontend port
 
 app.add_middleware(
     CORSMiddleware,
@@ -17,34 +17,44 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-class Item(BaseModel):
+class Film(BaseModel):
+    id: int
     name: str
-    price: float
-    is_offer: Union[bool, None] = None
+    poster: str
 
+@app.get("/films")
+def list_films():
+    return [Film(id=1, name="Avatar", poster="avatar_url"), Film(id=2, name="Titanic", poster="titanic_url"), Film(id=3, name="Star Wars", poster="star_wars_url")]
 
-@app.get("/")
-def read_root():
-    return {"Hello": "World"}
+@app.post("/rooms")
+def create_room():
+    room_id = "".join(random.sample(string.ascii_uppercase, 5))
+    while room_id in rooms:
+        room_id = random.sample(string.ascii_uppercase, 5)
+    
+    rooms[room_id] = {}
 
+    return {"id": room_id}
 
-@app.get("/items")
-def list_items():
-    return [{"id": 1, "name": "item1"}, {"id": 2, "name": "item2"}]
-
-@app.get("/items/{item_id}")
-def read_item(item_id: int, q: Union[str, None] = None):
-    return {"item_id": item_id, "q": q}
-
-
-@app.put("/items/{item_id}")
-def update_item(item_id: int, item: Item):
-    return {"item_name": item.name, "item_id": item_id}
-
-
-@app.websocket("/ws")
-async def websocket_endpoint(websocket: WebSocket):
+rooms = {}
+@app.websocket("/ws/{room_id}")
+async def websocket_endpoint(websocket: WebSocket, room_id: str):
+    if room_id not in rooms:
+        await websocket.close()
+        return
+    
     await websocket.accept()
-    while True:
-        data = await websocket.receive_text()
-        await websocket.send_text(f"Message text was: {data}")
+    connection_id = len(rooms[room_id])
+    rooms[room_id][connection_id] = websocket
+
+    try:
+        while True:
+            await websocket.receive_text()
+            await broadcast(room_id, f"User {connection_id} clicked.")
+                
+    finally:
+        del rooms[room_id][connection_id]
+
+async def broadcast(room_id: str, message: str):
+    for connection in rooms[room_id].values():
+        await connection.send_text(message)
