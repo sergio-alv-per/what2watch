@@ -1,9 +1,9 @@
-from typing import Union
 from fastapi import FastAPI, WebSocket
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 import random
 import string
+import tmdb_api
 
 app = FastAPI()
 
@@ -17,14 +17,17 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+TMDB_API = tmdb_api.tmdb_api_from_key_file("tmdb.key")
+
 class Film(BaseModel):
     id: int
     name: str
     poster: str
+    description: str
 
 @app.get("/films")
 def list_films():
-    return [Film(id=1, name="Avatar", poster="avatar_url"), Film(id=2, name="Titanic", poster="titanic_url"), Film(id=3, name="Star Wars", poster="star_wars_url")]
+    return [Film(id=f["id"], name=f["name"], poster=f["poster"], description=f["description"]) for f in TMDB_API.get_popular()]
 
 @app.post("/rooms")
 def create_room():
@@ -37,7 +40,7 @@ def create_room():
     return {"id": room_id}
 
 rooms = {}
-@app.websocket("/ws/{room_id}")
+@app.websocket("/rooms/{room_id}/ws")
 async def websocket_endpoint(websocket: WebSocket, room_id: str):
     if room_id not in rooms:
         await websocket.close()
