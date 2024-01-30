@@ -23,5 +23,12 @@ dist-ssr
 *.sln
 *.sw?
 
+# Python
 *venv
 __pycache__
+
+# API Keys
+*.key
+
+# Requests cache
+*.sqlite
