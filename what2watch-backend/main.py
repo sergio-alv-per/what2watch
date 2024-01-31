@@ -107,6 +107,5 @@ async def websocket_endpoint(websocket: WebSocket, user_id: str, room_id: str):
 
     while True:
         data = await websocket.receive_text()
-        print(data)
         await websocket.send_text(f"Response for {data}")
     

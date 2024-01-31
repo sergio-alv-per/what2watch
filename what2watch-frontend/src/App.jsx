@@ -92,7 +92,6 @@ function Button({ children, disabled, ...props }) {
 }
 
 function Room({ userID, websocket }) {
-  const [films, setFilms] = useState([])
   const [recievedMessage, setRecievedMessage] = useState('')
   const { roomID } = useParams()
 
@@ -102,16 +101,9 @@ function Room({ userID, websocket }) {
     }
   }
 
-  useEffect(() => {
-    fetch('http://localhost:8000/films')
-      .then((res) => res.json())
-      .then((data) => setFilms(data))
-      .catch((err) => console.log(err))
-  }, [])
-
   return (
     <>
-      <FilmSwiper />
+      <FilmSwiper roomID={roomID} userID={userID} />
 
       <div>
       {
@@ -130,25 +122,13 @@ function Room({ userID, websocket }) {
   )
 }
 
-function FilmSwiper() {
+function FilmSwiper({ roomID, userID }) {
   const [shownFilmSet, setShownFilmSet] = useState(0)
   const [page0, setPage0] = useState(1)
   const [page1, setPage1] = useState(2)
   const { films: films0, loading: loading0, error: error0 } = usePopularFilms({ page: page0 })
   const { films: films1, loading: loading1, error: error1 } = usePopularFilms({ page: page1 })
   const [shownFilmIndex, setShownFilmIndex] = useState(0)
-
-  useEffect(() => {
-    console.log("Loading1:", loading0)
-    console.log("Error1:", error0)
-    console.log("Films1:", films0)
-  }, [loading0, error0, films0])
-
-  useEffect(() => {
-    console.log("Loading2:", loading1)
-    console.log("Error2:", error1)
-    console.log("Films2:", films1)
-  }, [loading1, error1, films1])
 
   const films = shownFilmSet === 0 ? films0 : films1
   const loading = shownFilmSet === 0 ? loading0 : loading1
@@ -173,6 +153,23 @@ function FilmSwiper() {
     }
   }
 
+  const sendSwipe = (liked) => {
+    const body = JSON.stringify({ film_id: films[shownFilmIndex].id, liked })
+    const headers = { 'Content-Type': 'application/json' }
+
+    fetch(`http://localhost:8000/rooms/${roomID}/users/${userID}/swipes`, {method: 'POST', body, headers})
+  }
+
+  const handleLike = () => {
+    sendSwipe(true)
+    handleNext()
+  }
+
+  const handleDislike = () => {
+    sendSwipe(false)
+    handleNext()
+  }
+
   return (
     <div className="flex flex-col justify-center items-center">
       <h3>Film Swiper</h3>
@@ -184,7 +181,8 @@ function FilmSwiper() {
           : <p>{films[shownFilmIndex].name}</p>
         }
       </div>
-      <button onClick={handleNext}>Next</button>
+      <button onClick={handleDislike}>Dislike</button>
+      <button onClick={handleLike}>Like</button>
     </div>
   )
 

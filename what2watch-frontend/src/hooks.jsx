@@ -18,7 +18,6 @@ export function usePopularFilms({ page = 1 }) {
                 setError(err)
                 setLoading(false)
             })
-        console.log(`fetching films page ${page}`)
     }, [page])
 
     return { films, loading, error }
