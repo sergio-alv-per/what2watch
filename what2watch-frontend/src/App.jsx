@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { BrowserRouter as Router, Routes, Route, useNavigate, useParams } from 'react-router-dom'
+import { BrowserRouter as Router, Routes, Route, Navigate, useNavigate, useParams } from 'react-router-dom'
 import { usePopularFilms } from './hooks'
 
 function App() {
@@ -11,6 +11,7 @@ function App() {
       <Routes>
         <Route path="/" element={<Home setUserID={setUserID} setWebSocket={setWebSocket} />}/>
         <Route path="/rooms/:roomID" element={<Room userID={userID} websocket={websocket} />} />
+        <Route path="*" element={<Navigate to="/"/>} />
       </Routes>
     </Router>
   )
@@ -102,23 +103,24 @@ function Room({ userID, websocket }) {
   }
 
   return (
-    <>
-      <FilmSwiper roomID={roomID} userID={userID} />
+    <div className="bg-slate-600 flex flex-col space-y-5 justify-center items-center p-4 min-h-screen">
+      <p className="text-white font-bold text-xl" >{roomID}</p>
 
-      <div>
-      {
-      websocket
+      {userID && websocket
       ? (
-      <>
-        <p>{roomID}</p>
-        <button onClick={() => websocket.send(`${userID} says hello!`)}>Send message</button>
-        <p>{recievedMessage}</p>
-      </>
+        <>
+          <FilmSwiper roomID={roomID} userID={userID} />
+
+          <div>
+            <button onClick={() => websocket.send(`${userID} says hello!`)}>Send message</button>
+            <p>{recievedMessage}</p>
+          </div>
+        </>
       )
-      : <p>Not connected</p>
+      : <p>Loading...</p>
       }
-      </div>
-    </>
+
+    </div>
   )
 }
 
@@ -171,22 +173,25 @@ function FilmSwiper({ roomID, userID }) {
   }
 
   return (
-    <div className="flex flex-col justify-center items-center">
-      <h3>Film Swiper</h3>
-      <p>Page: {page}</p>
+    <>
       <div>
         {
           loading
           ? <p>Loading...</p>
-          : <p>{films[shownFilmIndex].name}</p>
+          : (
+          <div className="flex flex-col space-y-5 justify-center items-center">
+            <img className="rounded-md shadow-md h-80" src={films[shownFilmIndex].poster} alt={films[shownFilmIndex].name} />
+            <p className="text-white font-bold text-xl" >{films[shownFilmIndex].name}</p>
+          </div>
+          )
         }
       </div>
-      <button onClick={handleDislike}>Dislike</button>
-      <button onClick={handleLike}>Like</button>
-    </div>
+      <div className="flex justify-center items-center space-x-5">
+        <button className="bg-red-200 rounded-md text-xl font-bold px-5 py-2" onClick={handleDislike}>Dislike</button>
+        <button className="bg-teal-200 rounded-md text-xl font-bold px-5 py-2" onClick={handleLike}>Like</button>
+      </div>
+    </>
   )
-
-
 }
 
 
