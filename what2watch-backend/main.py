@@ -42,10 +42,10 @@ class Swipe(BaseModel):
     liked: bool
 
 @app.get("/films")
-def list_films() -> list[Film]:
-    popular_films = app.TMDB_API.get_popular()
+def list_films(page: int = 1) -> list[Film]:
+    popular_films = app.TMDB_API.get_popular(page=page)
     app.sent_films.update(f["id"] for f in popular_films)
-    return [Film(id=f["id"], name=f["name"], poster=f["poster"], description=f["description"]) for f in app.TMDB_API.get_popular()]
+    return [Film(id=f["id"], name=f["name"], poster=f["poster"], description=f["description"]) for f in popular_films]
 
 @app.post("/rooms")
 def create_room() -> Room:
