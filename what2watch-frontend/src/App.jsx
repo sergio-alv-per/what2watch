@@ -7,6 +7,7 @@ import {
   useNavigate,
   useParams,
 } from "react-router-dom"
+import { FaCopy as Copy } from "react-icons/fa6"
 import { usePopularFilms } from "./hooks"
 
 function App() {
@@ -119,6 +120,7 @@ function Button({ children, disabled, ...props }) {
 function Room({ userID, websocket }) {
   const [recievedMessage, setRecievedMessage] = useState("")
   const { roomID } = useParams()
+  const navigate = useNavigate()
 
   if (websocket) {
     websocket.onmessage = (e) => {
@@ -126,24 +128,50 @@ function Room({ userID, websocket }) {
     }
   }
 
+  const leaveRoom = () => {
+    websocket.close()
+    navigate("/")
+  }
+
   return (
-    <div className="bg-slate-600 flex flex-col space-y-5 justify-center items-center p-4 min-h-screen">
-      <p className="text-white font-bold text-xl">{roomID}</p>
+    <div className="bg-slate-600 flex flex-col items-center min-h-screen">
+      <div className="space-x-5">
+        <button className="bg-teal-200 rounded-md p-2" onClick={leaveRoom}>
+          Leave room
+        </button>
+        <span className="text-white font-bold text-xl">What2Watch</span>
+      </div>
+      <div className="flex flex-col space-y-5 justify-center items-center p-4">
+        <RoomIDLabel roomID={roomID} />
 
-      {userID && websocket ? (
-        <>
-          <FilmSwiper roomID={roomID} userID={userID} />
+        {userID && websocket ? (
+          <>
+            <FilmSwiper roomID={roomID} userID={userID} />
 
-          <div>
-            <button onClick={() => websocket.send(`${userID} says hello!`)}>
-              Send message
-            </button>
-            <p>{recievedMessage}</p>
-          </div>
-        </>
-      ) : (
-        <p>Loading...</p>
-      )}
+            <div>
+              <p className="text-white font-bold text-xl">{recievedMessage}</p>
+            </div>
+          </>
+        ) : (
+          <p>Loading...</p>
+        )}
+      </div>
+    </div>
+  )
+}
+
+function RoomIDLabel({ roomID }) {
+  const copyRoomIDToClipboard = () => navigator.clipboard.writeText(roomID)
+
+  return (
+    <div className="flex space-x-2 items-center">
+      <span className="text-white font-bold text-xl">{roomID}</span>
+      <button
+        onClick={copyRoomIDToClipboard}
+        className="bg-teal-200 rounded-md p-2"
+      >
+        <Copy className="w-6 h-6" />
+      </button>
     </div>
   )
 }
