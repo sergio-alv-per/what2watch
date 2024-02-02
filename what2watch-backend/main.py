@@ -62,6 +62,16 @@ def add_user(room_id: str) -> User:
 
     return User(id=user_id)
 
+@app.delete("/rooms/{room_id}/users/{user_id}")
+def remove_user(room_id: str, user_id: str) -> None:
+    if room_id not in app.rooms:
+        raise HTTPException(status_code=404, detail="Room not found")
+
+    if user_id not in app.rooms[room_id]:
+        raise HTTPException(status_code=404, detail="User not in room")
+
+    del app.rooms[room_id][user_id]
+
 
 def intersect_swipes(d1, d2):
     # Intersects two dictionaries, keeping keys that are in both and whose
