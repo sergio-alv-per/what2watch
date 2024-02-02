@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react"
+import axios from "axios"
 
 export function usePopularFilms({ page = 1 }) {
   const [films, setFilms] = useState([])
@@ -8,10 +9,10 @@ export function usePopularFilms({ page = 1 }) {
   useEffect(() => {
     setLoading(true)
     setError(null)
-    fetch(`http://localhost:8000/films?page=${page}`)
-      .then((res) => res.json())
-      .then((data) => {
-        setFilms(data)
+    axios
+      .get(`http://localhost:8000/films?page=${page}`)
+      .then((res) => {
+        setFilms(res.data)
         setLoading(false)
       })
       .catch((err) => {
