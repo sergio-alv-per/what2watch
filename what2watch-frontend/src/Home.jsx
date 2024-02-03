@@ -1,5 +1,6 @@
 import axios from "axios"
 import { useNavigate } from "react-router-dom"
+import { InfoCarousel } from "./InfoCarousel"
 
 export function Home() {
   const navigate = useNavigate()
@@ -23,8 +24,8 @@ export function Home() {
   return (
     <div className="bg-slate-600 flex flex-col space-y-5 justify-center items-center p-4 min-h-screen">
       <h1 className="text-white font-bold font-mono text-5xl">What2Watch</h1>
-      <div className="flex justify-center items-center h-64 w-64">
-        <p className="text-white"> placeholder carousel </p>
+      <div className="flex justify-center items-center max-w-md">
+        <InfoCarousel />
       </div>
       <Button onClick={createRoomAndConnect}>Create room</Button>
       <p className="text-white">or</p>
