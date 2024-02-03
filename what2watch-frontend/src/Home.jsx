@@ -1,3 +1,4 @@
+import { useState } from "react"
 import axios from "axios"
 import { useNavigate } from "react-router-dom"
 import { InfoCarousel } from "./InfoCarousel"
@@ -22,26 +23,40 @@ export function Home() {
   }
 
   return (
-    <div className="bg-slate-600 flex flex-col space-y-5 justify-center items-center p-4 min-h-screen">
+    <div className="bg-slate-600 flex flex-col gap-3 justify-center items-center p-4 min-h-screen">
       <h1 className="text-white font-bold font-mono text-5xl">What2Watch</h1>
       <div className="flex justify-center items-center max-w-md">
         <InfoCarousel />
       </div>
       <Button onClick={createRoomAndConnect}>Create room</Button>
       <p className="text-white">or</p>
-      <form
-        className="flex flex-col space-y-5 justify-center items-center"
-        onSubmit={connectToRoom}
-      >
-        <input
-          className="rounded-md border-2 border-teal-500 bg-slate-600 text-white text-xl font-bold px-2 py-2"
-          type="text"
-          name="roomID"
-          placeholder="Room ID"
-        />
-        <Button type="submit">Connect to room</Button>
-      </form>
+      <ConnectToRoom connectFunction={connectToRoom} />
     </div>
+  )
+}
+
+function ConnectToRoom({ connectFunction }) {
+  const [roomID, setRoomID] = useState("")
+
+  const roomIDLength = 5
+
+  return (
+    <form
+      className="flex flex-col space-y-5 justify-center items-center"
+      onSubmit={connectFunction}
+    >
+      <input
+        className="rounded-md border-2 border-teal-500 bg-slate-600 text-white text-xl font-bold px-2 py-2 w-36 text-center"
+        type="text"
+        name="roomID"
+        value={roomID}
+        onChange={(e) =>
+          setRoomID(e.target.value.toUpperCase().slice(0, roomIDLength))
+        }
+        placeholder="Room ID"
+      />
+      <Button type="submit">Connect to room</Button>
+    </form>
   )
 }
 
