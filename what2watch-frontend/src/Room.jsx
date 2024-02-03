@@ -7,7 +7,7 @@ import { usePopularFilms } from "./hooks"
 export function Room() {
   const [userID, setUserID] = useState(null)
   const [websocket, setWebSocket] = useState(null)
-  const [recievedMessage, setRecievedMessage] = useState("")
+  const [recievedMatch, setRecievedMatch] = useState(null)
   const { roomID } = useParams()
   const navigate = useNavigate()
 
@@ -56,7 +56,9 @@ export function Room() {
       }
 
       ws.onmessage = (e) => {
-        setRecievedMessage(e.data)
+        setRecievedMatch(JSON.parse(e.data))
+        console.log("Recieved match:", e.data)
+        console.log("Type of recieved match:", typeof e.data)
       }
 
       setWebSocket(ws)
@@ -66,6 +68,11 @@ export function Room() {
       }
     }
   }, [roomID, userID])
+
+  useEffect(() => {
+    console.log("Recieved match:", recievedMatch)
+    console.log("!= null?", recievedMatch !== null)
+  }, [recievedMatch])
 
   return (
     <div className="bg-slate-600 flex flex-col items-center min-h-screen">
@@ -83,16 +90,32 @@ export function Room() {
 
         {userID && websocket ? (
           <>
-            <FilmSwiper roomID={roomID} userID={userID} />
-
-            <div>
-              <p className="text-white font-bold text-xl">{recievedMessage}</p>
-            </div>
+            {recievedMatch ? (
+              <Match match={recievedMatch} />
+            ) : (
+              <FilmSwiper roomID={roomID} userID={userID} />
+            )}
           </>
         ) : (
           <p>Loading...</p>
         )}
       </div>
+    </div>
+  )
+}
+
+function Match({ match }) {
+  
+  return (
+    <div className="flex flex-col gap-5 justify-center items-center">
+      <p className="text-white font-bold text-xl">{"It's a match!:"}</p>
+      <img
+        className="rounded-md shadow-md h-80"
+        src={match.poster}
+        alt={match.name}
+      />
+      <p className="text-white font-bold text-xl">{match.name}</p>
+      <p className="text-white">{match.description}</p>
     </div>
   )
 }
@@ -169,7 +192,7 @@ function FilmSwiper({ roomID, userID }) {
         {loading ? (
           <p>Loading...</p>
         ) : (
-          <div className="flex flex-col space-y-5 justify-center items-center">
+          <div className="flex flex-col gap-5 justify-center items-center">
             <img
               className="rounded-md shadow-md h-80"
               src={films[shownFilmIndex].poster}

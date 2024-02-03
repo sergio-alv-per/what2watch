@@ -26,13 +26,7 @@ app.connections = {}
 
 @app.get("/films")
 def list_films(page: int = 1) -> list[Film]:
-    popular_films = app.TMDB_API.get_popular(page)
-    return [
-        Film(
-            id=f["id"], name=f["name"], poster=f["poster"], description=f["description"]
-        )
-        for f in popular_films
-    ]
+    return app.TMDB_API.get_popular(page)
 
 
 def generate_room_id():
@@ -61,6 +55,7 @@ def add_user(room_id: str) -> User:
     app.rooms[room_id][user_id] = {}
 
     return User(id=user_id)
+
 
 @app.delete("/rooms/{room_id}/users/{user_id}")
 def remove_user(room_id: str, user_id: str) -> None:
@@ -97,10 +92,11 @@ def check_for_matches(room_id):
 
 
 async def send_match(room_id, film_id):
+    film_details = app.TMDB_API.get_film_details(film_id)
     for user_in_room in app.rooms[room_id]:
         if (room_id, user_in_room) in app.connections:
-            await app.connections[(room_id, user_in_room)].send_text(
-                f"Match on film {film_id}!"
+            await app.connections[(room_id, user_in_room)].send_json(
+                film_details.model_dump()
             )
 
 
