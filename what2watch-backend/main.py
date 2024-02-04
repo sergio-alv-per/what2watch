@@ -30,9 +30,10 @@ def list_films(page: int = 1) -> list[Film]:
 
 
 def generate_room_id():
-    room_id = "".join(random.sample(string.ascii_uppercase, 5))
+    easily_legible_chars = tuple(set(string.ascii_uppercase) - {"O", "I", "L"})
+    room_id = "".join(random.sample(easily_legible_chars, 5))
     while room_id in app.rooms:
-        room_id = random.sample(string.ascii_uppercase, 5)
+        room_id = "".join(random.sample(easily_legible_chars, 5))
 
     return room_id
 
