@@ -38,6 +38,8 @@ export function Home() {
 function ConnectToRoom({ connectFunction }) {
   const [roomID, setRoomID] = useState("")
 
+  const filterStringKeepAlpha = (str) => str.replace(/[^a-zA-Z]/g, "")
+
   const roomIDLength = 5
 
   return (
@@ -51,11 +53,17 @@ function ConnectToRoom({ connectFunction }) {
         name="roomID"
         value={roomID}
         onChange={(e) =>
-          setRoomID(e.target.value.toUpperCase().slice(0, roomIDLength))
+          setRoomID(
+            filterStringKeepAlpha(e.target.value)
+              .toUpperCase()
+              .slice(0, roomIDLength)
+          )
         }
         placeholder="Room ID"
       />
-      <Button type="submit">Connect to room</Button>
+      <Button type="submit" disabled={roomID === ""}>
+        Connect to room
+      </Button>
     </form>
   )
 }
@@ -66,7 +74,11 @@ function Button({ children, disabled, ...props }) {
     "bg-teal-200 rounded-md text-xl font-bold px-5 py-2 opacity-50 cursor-not-allowed"
 
   return (
-    <button className={disabled ? disabledStyles : enabledStyles} {...props}>
+    <button
+      className={disabled ? disabledStyles : enabledStyles}
+      disabled={disabled}
+      {...props}
+    >
       {children}
     </button>
   )
