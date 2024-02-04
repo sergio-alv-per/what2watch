@@ -9,7 +9,7 @@ export function InfoCarousel() {
     {
       id: "create-rooms",
       description:
-        "Create a room and invite your friends to join. You can also join a room by entering the room code.",
+        "Create a room and invite your friends to join. You can join a room by entering the room code.",
       image: "./1.png",
     },
     {
