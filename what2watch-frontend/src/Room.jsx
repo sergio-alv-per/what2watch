@@ -3,6 +3,7 @@ import { useParams, useNavigate } from "react-router-dom"
 import axios from "axios"
 import { FaCopy as Copy } from "react-icons/fa6"
 import { usePopularFilms } from "./hooks"
+import { FaArrowLeft as LeftArrow } from "react-icons/fa6"
 
 export function Room() {
   const [userID, setUserID] = useState(null)
@@ -26,7 +27,11 @@ export function Room() {
           if (axios.isCancel(err)) {
             console.log("Post /users request cancelled")
           } else {
-            console.log(err)
+            if (err.response.status === 404) {
+              navigate("/404")
+            } else {
+              console.log(err)
+            }
           }
         })
 
@@ -38,7 +43,7 @@ export function Room() {
         axios.delete(`http://localhost:8000/rooms/${roomID}/users/${userID}`)
       }
     }
-  }, [roomID, userID])
+  }, [roomID, userID, navigate])
 
   useEffect(() => {
     if (userID && roomID) {
@@ -75,13 +80,10 @@ export function Room() {
   }, [recievedMatch])
 
   return (
-    <div className="bg-slate-600 flex flex-col items-center min-h-screen">
-      <div className="space-x-5">
-        <button
-          className="bg-teal-200 rounded-md p-2"
-          onClick={() => navigate("/")}
-        >
-          Leave room
+    <div className="bg-slate-600 flex flex-col items-center p-4 min-h-screen">
+      <div className="flex gap-5 items-center">
+        <button onClick={() => navigate("/")}>
+          <LeftArrow className="w-10 h-10 bg-teal-200 rounded-md p-2" />
         </button>
         <span className="text-white font-bold text-xl">What2Watch</span>
       </div>
