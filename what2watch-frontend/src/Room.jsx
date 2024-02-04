@@ -30,7 +30,7 @@ export function Room() {
             if (err.response.status === 404) {
               navigate("/404")
             } else {
-              console.log(err)
+              console.log("Unknown error when creating a user: " + err)
             }
           }
         })
@@ -62,8 +62,6 @@ export function Room() {
 
       ws.onmessage = (e) => {
         setRecievedMatch(JSON.parse(e.data))
-        console.log("Recieved match:", e.data)
-        console.log("Type of recieved match:", typeof e.data)
       }
 
       setWebSocket(ws)
@@ -73,11 +71,6 @@ export function Room() {
       }
     }
   }, [roomID, userID])
-
-  useEffect(() => {
-    console.log("Recieved match:", recievedMatch)
-    console.log("!= null?", recievedMatch !== null)
-  }, [recievedMatch])
 
   return (
     <div className="bg-slate-600 flex flex-col items-center p-4 min-h-screen">
@@ -108,7 +101,6 @@ export function Room() {
 }
 
 function Match({ match }) {
-  
   return (
     <div className="flex flex-col gap-5 justify-center items-center">
       <p className="text-white font-bold text-xl">{"It's a match!:"}</p>
