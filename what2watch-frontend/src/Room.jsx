@@ -88,14 +88,15 @@ export function Room() {
         <span className="text-white font-bold text-xl">What2Watch</span>
       </div>
       <div className="flex flex-col space-y-5 justify-center items-center p-4">
-        <RoomIDLabel roomID={roomID} />
-
         {userID && websocket ? (
           <>
             {recievedMatch ? (
               <Match match={recievedMatch} />
             ) : (
-              <FilmSwiper roomID={roomID} userID={userID} />
+              <>
+                <RoomIDLabel roomID={roomID} />
+                <FilmSwiper roomID={roomID} userID={userID} />
+              </>
             )}
           </>
         ) : (
