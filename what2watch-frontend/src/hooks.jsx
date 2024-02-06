@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react"
 import axios from "axios"
+import API from "./API"
 
 export function useFilms() {
   const [shownFilmBuffer, setShownFilmBuffer] = useState(0)
@@ -61,7 +62,7 @@ function useFilmPage({ page = 1 }) {
     setLoading(true)
     setError(null)
     axios
-      .get(`http://localhost:8000/films?page=${page}`)
+      .get(API.instance().getHTTPSURLForPath(`/films?page=${page}`))
       .then((res) => {
         setFilms(res.data)
         setLoading(false)

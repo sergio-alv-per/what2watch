@@ -9,6 +9,7 @@ import {
   FaXmark as Cross,
 } from "react-icons/fa6"
 import { Footer } from "./Footer"
+import API from "./API"
 
 export function Room() {
   const [userID, setUserID] = useState(null)
@@ -22,7 +23,7 @@ export function Room() {
 
       axios
         .post(
-          `http://localhost:8000/rooms/${roomID}/users`,
+          API.instance().getHTTPSURLForPath(`/rooms/${roomID}/users`),
           {},
           { signal: abortController.signal }
         )
@@ -45,7 +46,9 @@ export function Room() {
     } else {
       return () => {
         axios
-          .delete(`http://localhost:8000/rooms/${roomID}/users/${userID}`)
+          .delete(
+            API.instance().getHTTPSURLForPath(`/rooms/${roomID}/users/${userID}`)
+          )
           .catch((err) => {
             console.log("Error deleting user: " + err)
           })
@@ -56,7 +59,7 @@ export function Room() {
   useEffect(() => {
     if (userID && roomID) {
       const ws = new WebSocket(
-        `ws://localhost:8000/rooms/${roomID}/users/${userID}/ws`
+        API.instance().getWSSURLForPath(`/rooms/${roomID}/users/${userID}/ws`)
       )
 
       ws.onerror = () => {
@@ -155,7 +158,9 @@ function FilmSwiper({ roomID, userID }) {
 
     axios
       .post(
-        `http://localhost:8000/rooms/${roomID}/users/${userID}/swipes`,
+        API.instance().getHTTPSURLForPath(
+          `/rooms/${roomID}/users/${userID}/swipes`
+        ),
         body,
         { headers }
       )

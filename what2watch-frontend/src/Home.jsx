@@ -3,13 +3,14 @@ import axios from "axios"
 import { useNavigate, Link } from "react-router-dom"
 import { InfoCarousel } from "./InfoCarousel"
 import { Footer } from "./Footer"
+import API from "./API"
 
 export function Home() {
   const navigate = useNavigate()
 
   const createRoomAndConnect = () => {
     axios
-      .post("http://localhost:8000/rooms")
+      .post(API.instance().getHTTPSURLForPath("/rooms"))
       .then((response) => response.data.id)
       .then((roomID) => {
         navigate(`/rooms/${roomID}`)
