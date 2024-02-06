@@ -37,9 +37,9 @@ export function InfoCarousel() {
 
 function CarouselInfoSlide({ item }) {
   return (
-    <div className="min-w-full">
-      <img src={item.image} />
-      <p className="text-white text-center">{item.description}</p>
+    <div className="flex flex-col min-w-full h-64">
+      <img src={item.image} className="min-w-0 min-h-0 object-contain" />
+      <p className="text-gray-800 text-center mt-3">{item.description}</p>
     </div>
   )
 }
@@ -89,13 +89,13 @@ function Carousel({
       <div className="absolute inset-0 flex items-center justify-between p-4">
         <button
           onClick={prevSlide}
-          className="p-3 rounded-full shadow bg-teal-200 text-black hover:transition-transform hover:scale-110"
+          className="p-3 rounded-full shadow bg-emerald-800 text-white transition-transform hover:scale-110"
         >
           <LeftArrow />
         </button>
         <button
           onClick={nextSlide}
-          className="p-3 rounded-full shadow bg-teal-200 text-black hover:transition-transform hover:scale-110"
+          className="p-3 rounded-full shadow bg-emerald-800 text-white transition-transform hover:scale-110"
         >
           <RightArrow />
         </button>
@@ -107,7 +107,7 @@ function Carousel({
             <div
               key={i}
               className={`
-              transition-all w-3 h-3 bg-teal-200 rounded-full
+              transition-all w-3 h-3 bg-emerald-800 rounded-full
               ${activeSlide === i ? "p-2" : "bg-opacity-50"}
             `}
             />

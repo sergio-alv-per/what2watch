@@ -2,8 +2,12 @@ import { useEffect, useState } from "react"
 import { useParams, useNavigate } from "react-router-dom"
 import axios from "axios"
 import { FaCopy as Copy } from "react-icons/fa6"
-import { usePopularFilms } from "./hooks"
-import { FaArrowLeft as LeftArrow } from "react-icons/fa6"
+import { useFilms } from "./hooks"
+import {
+  FaArrowLeft as LeftArrow,
+  FaCheck as Check,
+  FaXmark as Cross,
+} from "react-icons/fa6"
 
 export function Room() {
   const [userID, setUserID] = useState(null)
@@ -11,7 +15,6 @@ export function Room() {
   const [recievedMatch, setRecievedMatch] = useState(null)
   const { roomID } = useParams()
   const navigate = useNavigate()
-
   useEffect(() => {
     if (!userID) {
       const abortController = new AbortController()
@@ -73,21 +76,23 @@ export function Room() {
   }, [roomID, userID])
 
   return (
-    <div className="bg-slate-600 flex flex-col items-center p-4 min-h-screen">
-      <div className="flex gap-5 items-center">
-        <button onClick={() => navigate("/")}>
-          <LeftArrow className="w-10 h-10 bg-teal-200 rounded-md p-2" />
-        </button>
-        <span className="text-white font-bold text-xl">What2Watch</span>
-      </div>
-      <div className="flex flex-col space-y-5 justify-center items-center p-4">
+    <div className="flex justify-center">
+      <div className="flex flex-col gap-5 items-center min-h-screen max-w-xl pb-5">
+        <div className="flex place-content-between w-full p-2">
+          <button
+            onClick={() => navigate("/")}
+            className="p-3 rounded-full shadow bg-emerald-800 text-white transition-transform hover:scale-110"
+          >
+            <LeftArrow />
+          </button>
+          <RoomIDLabel roomID={roomID} />
+        </div>
         {userID && websocket ? (
           <>
             {recievedMatch ? (
               <Match match={recievedMatch} />
             ) : (
               <>
-                <RoomIDLabel roomID={roomID} />
                 <FilmSwiper roomID={roomID} userID={userID} />
               </>
             )}
@@ -119,49 +124,26 @@ function RoomIDLabel({ roomID }) {
   const copyRoomIDToClipboard = () => navigator.clipboard.writeText(roomID)
 
   return (
-    <div className="flex space-x-2 items-center">
-      <span className="text-white font-bold text-xl">{roomID}</span>
+    <div className="flex gap-2 items-center">
+      <span className="text-gray-800 font-semibold text-xl uppercase">
+        {roomID}
+      </span>
       <button
         onClick={copyRoomIDToClipboard}
-        className="bg-teal-200 rounded-md p-2"
+        className="p-3 rounded-full shadow bg-emerald-800 text-white transition-transform hover:scale-110"
       >
-        <Copy className="w-6 h-6" />
+        <Copy />
       </button>
     </div>
   )
 }
 
 function FilmSwiper({ roomID, userID }) {
-  const [shownFilmSet, setShownFilmSet] = useState(0)
-  const [page0, setPage0] = useState(1)
-  const [page1, setPage1] = useState(2)
-  const { films: films0, loading: loading0 } = usePopularFilms({ page: page0 })
-  const { films: films1, loading: loading1 } = usePopularFilms({ page: page1 })
-  const [shownFilmIndex, setShownFilmIndex] = useState(0)
-
-  const films = shownFilmSet === 0 ? films0 : films1
-  const loading = shownFilmSet === 0 ? loading0 : loading1
-
-  const handleNext = () => {
-    const nextShownFilmIndex = shownFilmIndex + 1
-
-    if (nextShownFilmIndex < films.length) {
-      setShownFilmIndex(nextShownFilmIndex)
-    } else {
-      if (shownFilmSet === 0) {
-        setShownFilmSet(1)
-        setPage0(page0 + 2)
-      } else {
-        setShownFilmSet(0)
-        setPage1(page1 + 2)
-      }
-
-      setShownFilmIndex(0)
-    }
-  }
+  const { current, next, previous, advance, loading } = useFilms()
+  const [previousLiked, setPreviousLiked] = useState(null)
 
   const sendSwipe = (liked) => {
-    const body = JSON.stringify({ film_id: films[shownFilmIndex].id, liked })
+    const body = JSON.stringify({ film_id: current().id, liked })
     const headers = { "Content-Type": "application/json" }
 
     axios.post(
@@ -173,12 +155,14 @@ function FilmSwiper({ roomID, userID }) {
 
   const handleLike = () => {
     sendSwipe(true)
-    handleNext()
+    setPreviousLiked(true)
+    advance()
   }
 
   const handleDislike = () => {
     sendSwipe(false)
-    handleNext()
+    setPreviousLiked(false)
+    advance()
   }
 
   return (
@@ -187,32 +171,76 @@ function FilmSwiper({ roomID, userID }) {
         {loading ? (
           <p>Loading...</p>
         ) : (
-          <div className="flex flex-col gap-5 justify-center items-center">
-            <img
-              className="rounded-md shadow-md h-80"
-              src={films[shownFilmIndex].poster}
-              alt={films[shownFilmIndex].name}
-            />
-            <p className="text-white font-bold text-xl">
-              {films[shownFilmIndex].name}
-            </p>
-          </div>
+          <CardStack
+            previous={previous()}
+            current={current()}
+            next={next()}
+            previousLiked={previousLiked}
+          />
         )}
       </div>
-      <div className="flex justify-center items-center space-x-5">
+      <div className="flex justify-center items-center gap-16">
         <button
-          className="bg-red-200 rounded-md text-xl font-bold px-5 py-2"
           onClick={handleDislike}
+          className="bg-rose-800 text-white rounded-full p-3 shadow-sm transition hover:scale-105 hover:shadow-xl"
         >
-          Dislike
+          <Cross className="w-12 h-12" />
         </button>
         <button
-          className="bg-teal-200 rounded-md text-xl font-bold px-5 py-2"
           onClick={handleLike}
+          className="bg-emerald-800 text-white rounded-full p-3 shadow-sm transition hover:scale-105 hover:shadow-xl"
         >
-          Like
+          <Check className="w-12 h-12" />
         </button>
       </div>
     </>
+  )
+}
+
+function CardStack({ previous, current, next, previousLiked }) {
+  return (
+    <div className="relative my-12">
+      {previous && (
+        <FilmCard
+          film={previous}
+          swiped
+          liked={previousLiked}
+          className={"absolute z-20"}
+        />
+      )}
+      <FilmCard film={current} className={"absolute z-10"} />
+      <FilmCard film={next} className={"top-0 z-0"} />
+    </div>
+  )
+}
+
+function FilmCard({ film, className, swiped = false, liked = false }) {
+  const [swipedState, setSwipedState] = useState(false)
+
+  useEffect(() => {
+    setSwipedState(false)
+    if (swiped) {
+      setTimeout(() => setSwipedState(true), 5)
+    }
+  }, [film, swiped])
+
+  const transformation = swipedState
+    ? liked
+      ? "transition duration-500 translate-x-full"
+      : "transition duration-500 -translate-x-full"
+    : "translate-x-0"
+  const opacity = swipedState ? "opacity-0" : "opacity-100"
+
+  return (
+    <div
+      className={`flex flex-col h-96 w-72 gap-3 justify-center items-center p-5 rounded-xl shadow-xl bg-emerald-800 ${transformation} ${opacity} ${className}`}
+    >
+      <img
+        className="min-w-0 min-h-0 rounded-md shadow-md object-contain border-2 border-white"
+        src={film.poster}
+        alt={film.name}
+      />
+      <p className="text-white font-bold text-xl">{film.name}</p>
+    </div>
   )
 }

@@ -23,14 +23,16 @@ export function Home() {
   }
 
   return (
-    <div className="bg-slate-600 flex flex-col gap-3 justify-center items-center p-4 min-h-screen">
-      <h1 className="text-white font-bold font-mono text-5xl">What2Watch</h1>
-      <div className="flex justify-center items-center max-w-md">
-        <InfoCarousel />
+    <div className="flex justify-center">
+      <div className="flex flex-col gap-3 items-center min-h-screen max-w-xl pb-5">
+        <img src="./logo.svg" alt="What2Watch logo" className="p-5 h-24" />
+        <div className="px-10">
+          <InfoCarousel />
+        </div>
+        <Button onClick={createRoomAndConnect}>Create a room</Button>
+        <p className="text-gray-800">or</p>
+        <ConnectToRoom connectFunction={connectToRoom} />
       </div>
-      <Button onClick={createRoomAndConnect}>Create room</Button>
-      <p className="text-white">or</p>
-      <ConnectToRoom connectFunction={connectToRoom} />
     </div>
   )
 }
@@ -48,7 +50,7 @@ function ConnectToRoom({ connectFunction }) {
       onSubmit={connectFunction}
     >
       <input
-        className="rounded-md border-2 border-teal-500 bg-slate-600 text-white text-xl font-bold px-2 py-2 w-36 text-center"
+        className="rounded-md border-2 border-emerald-800 text-gray-800 text-xl font-bold px-2 py-2 w-36 text-center"
         type="text"
         name="roomID"
         value={roomID}
@@ -62,16 +64,17 @@ function ConnectToRoom({ connectFunction }) {
         placeholder="Room ID"
       />
       <Button type="submit" disabled={roomID === ""}>
-        Connect to room
+        Join a room
       </Button>
     </form>
   )
 }
 
 function Button({ children, disabled, ...props }) {
-  const enabledStyles = "bg-teal-200 rounded-md text-xl font-bold px-5 py-2"
+  const enabledStyles =
+    "bg-emerald-800 text-white rounded-md uppercase font-semibold px-5 py-2"
   const disabledStyles =
-    "bg-teal-200 rounded-md text-xl font-bold px-5 py-2 opacity-50 cursor-not-allowed"
+    "bg-emerald-800 text-white rounded-md uppercase font-semibold px-5 py-2 opacity-50 cursor-not-allowed"
 
   return (
     <button
