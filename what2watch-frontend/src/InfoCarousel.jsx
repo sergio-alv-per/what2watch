@@ -10,19 +10,19 @@ export function InfoCarousel() {
       id: "create-rooms",
       description:
         "Create a room and invite your friends to join. You can join a room by entering the room code.",
-      image: "./1.png",
+      image: "./create-room.svg",
     },
     {
       id: "swipe",
       description:
         "Swipe through a variety of movies and TV shows to find the perfect one to watch with your friends.",
-      image: "./2.png",
+      image: "./swipe.svg",
     },
     {
       id: "match-watch",
       description:
         "When you and all of your friends have swiped right on the same movie or TV show, it's time to watch!",
-      image: "./3.png",
+      image: "./match.svg",
     },
   ]
 
