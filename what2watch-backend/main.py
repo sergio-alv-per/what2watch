@@ -122,12 +122,12 @@ async def like_film(room_id: str, user_id: str, swipe: Swipe) -> None:
 async def websocket_endpoint(websocket: WebSocket, user_id: str, room_id: str) -> None:
     if room_id not in app.rooms:
         raise WebSocketException(
-            code=status.WS_1008_POLICY_VIOLATION, detail="Room not found"
+            code=status.WS_1008_POLICY_VIOLATION, reason="Room not found"
         )
 
     if user_id not in app.rooms[room_id]:
         raise WebSocketException(
-            code=status.WS_1008_POLICY_VIOLATION, detail="User not in room"
+            code=status.WS_1008_POLICY_VIOLATION, reason="User not in room"
         )
 
     await websocket.accept()
