@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react"
-import { useParams, useNavigate } from "react-router-dom"
+import { useParams, useNavigate, Link } from "react-router-dom"
 import axios from "axios"
 import { FaCopy as Copy } from "react-icons/fa6"
 import { useFilms } from "./hooks"
@@ -86,7 +86,7 @@ export function Room() {
   return (
     <div className="flex justify-center">
       <div className="flex flex-col gap-5 items-center min-h-screen max-w-xl pb-5">
-        <div className="flex place-content-between w-full p-2">
+        <div className="flex place-content-between p-2 w-screen max-w-xl">
           <button
             onClick={() => navigate("/")}
             className="p-3 rounded-full shadow bg-emerald-800 text-white transition-transform hover:scale-110"
@@ -109,8 +109,8 @@ export function Room() {
 
 function Match({ match }) {
   return (
-    <div className="flex flex-col gap-5 justify-center items-center">
-      <p className="text-gray-800 font-bold text-xl">{"It's a match!:"}</p>
+    <div className="flex flex-col gap-5 justify-center items-center px-10">
+      <p className="text-gray-800 font-semibold text-xl">{"It's a match!"}</p>
       <img
         className="rounded-md shadow-md h-80"
         src={match.poster}
@@ -118,6 +118,9 @@ function Match({ match }) {
       />
       <p className="text-gray-800 font-bold text-xl">{match.name}</p>
       <p className="text-gray-800">{match.description}</p>
+      <p className="text-gray-500 text-md underline">
+        <Link to="/">Go back to the home page</Link>
+      </p>
     </div>
   )
 }
@@ -194,7 +197,7 @@ function FilmCard({ film }) {
   return (
     <div
       className={
-        "flex flex-col h-96 w-72 gap-3 justify-center items-center p-5 rounded-xl shadow-xl bg-emerald-800"
+        "flex flex-col h-96 w-72 gap-3 justify-center items-center p-5 rounded-xl shadow-xl bg-emerald-800 my-4"
       }
     >
       <img
@@ -202,7 +205,7 @@ function FilmCard({ film }) {
         src={film.poster}
         alt={film.name}
       />
-      <p className="text-white font-bold text-xl">{film.name}</p>
+      <p className="text-white text-center font-bold text-xl">{film.name}</p>
     </div>
   )
 }
