@@ -1,6 +1,6 @@
 import { useState } from "react"
 import axios from "axios"
-import { useNavigate } from "react-router-dom"
+import { useNavigate, Link } from "react-router-dom"
 import { InfoCarousel } from "./InfoCarousel"
 
 export function Home() {
@@ -25,7 +25,9 @@ export function Home() {
   return (
     <div className="flex justify-center">
       <div className="flex flex-col gap-3 items-center min-h-screen max-w-xl pb-5">
-        <img src="./logo.svg" alt="What2Watch logo" className="p-5 h-24" />
+        <Link to="/">
+          <img src="./logo.svg" alt="What2Watch logo" className="p-5 h-24" />
+        </Link>
         <div className="px-10">
           <InfoCarousel />
         </div>
