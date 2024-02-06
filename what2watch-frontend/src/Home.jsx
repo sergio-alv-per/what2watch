@@ -32,9 +32,11 @@ export function Home() {
         <div className="px-10">
           <InfoCarousel />
         </div>
-        <Button onClick={createRoomAndConnect}>Create a room</Button>
-        <p className="text-gray-800">or</p>
-        <ConnectToRoom connectFunction={connectToRoom} />
+        <div className="flex flex-col items-center gap-1">
+          <Button onClick={createRoomAndConnect}>Create a room</Button>
+          <p className="text-gray-800">or</p>
+          <ConnectToRoom connectFunction={connectToRoom} />
+        </div>
         <Footer />
       </div>
     </div>
