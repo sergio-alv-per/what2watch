@@ -87,7 +87,7 @@ export function Room() {
   return (
     <div className="flex justify-center">
       <div className="flex flex-col justify-between items-center min-h-screen max-w-xl pb-5">
-        <div className="flex place-content-between p-2 w-screen max-w-xl">
+        <div className="flex place-content-between p-2 mt-4 w-screen max-w-xl">
           <button
             onClick={() => navigate("/")}
             className="p-3 rounded-full shadow bg-emerald-800 text-white transition-transform hover:scale-110"
