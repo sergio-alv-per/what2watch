@@ -43,7 +43,11 @@ export function Room() {
       }
     } else {
       return () => {
-        axios.delete(`http://localhost:8000/rooms/${roomID}/users/${userID}`)
+        axios
+          .delete(`http://localhost:8000/rooms/${roomID}/users/${userID}`)
+          .catch((err) => {
+            console.log("Error deleting user: " + err)
+          })
       }
     }
   }, [roomID, userID, navigate])
@@ -54,12 +58,16 @@ export function Room() {
         `ws://localhost:8000/rooms/${roomID}/users/${userID}/ws`
       )
 
+      ws.onerror = () => {
+        console.log(`WS: ${userID} error on connection.`)
+      }
+
       ws.onopen = () => {
         console.log(`WS: ${userID} connected to room ${roomID}`)
       }
 
       ws.onclose = () => {
-        console.log(`WS: ${userID} disconnected to room ${roomID}`)
+        console.log(`WS: ${userID} disconnected from room ${roomID}`)
         setWebSocket(null)
       }
 
@@ -87,16 +95,10 @@ export function Room() {
           </button>
           <RoomIDLabel roomID={roomID} />
         </div>
-        {userID && websocket ? (
-          <>
-            {recievedMatch ? (
-              <Match match={recievedMatch} />
-            ) : (
-              <>
-                <FilmSwiper roomID={roomID} userID={userID} />
-              </>
-            )}
-          </>
+        {recievedMatch ? (
+          <Match match={recievedMatch} />
+        ) : userID && websocket ? (
+          <FilmSwiper roomID={roomID} userID={userID} />
         ) : (
           <p>Loading...</p>
         )}
@@ -108,14 +110,14 @@ export function Room() {
 function Match({ match }) {
   return (
     <div className="flex flex-col gap-5 justify-center items-center">
-      <p className="text-white font-bold text-xl">{"It's a match!:"}</p>
+      <p className="text-gray-800 font-bold text-xl">{"It's a match!:"}</p>
       <img
         className="rounded-md shadow-md h-80"
         src={match.poster}
         alt={match.name}
       />
-      <p className="text-white font-bold text-xl">{match.name}</p>
-      <p className="text-white">{match.description}</p>
+      <p className="text-gray-800 font-bold text-xl">{match.name}</p>
+      <p className="text-gray-800">{match.description}</p>
     </div>
   )
 }
@@ -139,46 +141,37 @@ function RoomIDLabel({ roomID }) {
 }
 
 function FilmSwiper({ roomID, userID }) {
-  const { current, next, previous, advance, loading } = useFilms()
-  const [previousLiked, setPreviousLiked] = useState(null)
+  const { current, advance, loading } = useFilms()
+  const currentFilm = current()
 
   const sendSwipe = (liked) => {
-    const body = JSON.stringify({ film_id: current().id, liked })
+    const body = JSON.stringify({ film_id: currentFilm.id, liked })
     const headers = { "Content-Type": "application/json" }
 
-    axios.post(
-      `http://localhost:8000/rooms/${roomID}/users/${userID}/swipes`,
-      body,
-      { headers }
-    )
+    axios
+      .post(
+        `http://localhost:8000/rooms/${roomID}/users/${userID}/swipes`,
+        body,
+        { headers }
+      )
+      .catch((err) => {
+        console.log("Error sending swipe: " + err)
+      })
   }
 
   const handleLike = () => {
     sendSwipe(true)
-    setPreviousLiked(true)
     advance()
   }
 
   const handleDislike = () => {
     sendSwipe(false)
-    setPreviousLiked(false)
     advance()
   }
 
   return (
     <>
-      <div>
-        {loading ? (
-          <p>Loading...</p>
-        ) : (
-          <CardStack
-            previous={previous()}
-            current={current()}
-            next={next()}
-            previousLiked={previousLiked}
-          />
-        )}
-      </div>
+      <div>{loading ? <p>Loading...</p> : <FilmCard film={currentFilm} />}</div>
       <div className="flex justify-center items-center gap-16">
         <button
           onClick={handleDislike}
@@ -197,43 +190,12 @@ function FilmSwiper({ roomID, userID }) {
   )
 }
 
-function CardStack({ previous, current, next, previousLiked }) {
-  return (
-    <div className="relative my-12">
-      {previous && (
-        <FilmCard
-          film={previous}
-          swiped
-          liked={previousLiked}
-          className={"absolute z-20"}
-        />
-      )}
-      <FilmCard film={current} className={"absolute z-10"} />
-      <FilmCard film={next} className={"top-0 z-0"} />
-    </div>
-  )
-}
-
-function FilmCard({ film, className, swiped = false, liked = false }) {
-  const [swipedState, setSwipedState] = useState(false)
-
-  useEffect(() => {
-    setSwipedState(false)
-    if (swiped) {
-      setTimeout(() => setSwipedState(true), 5)
-    }
-  }, [film, swiped])
-
-  const transformation = swipedState
-    ? liked
-      ? "transition duration-500 translate-x-full"
-      : "transition duration-500 -translate-x-full"
-    : "translate-x-0"
-  const opacity = swipedState ? "opacity-0" : "opacity-100"
-
+function FilmCard({ film }) {
   return (
     <div
-      className={`flex flex-col h-96 w-72 gap-3 justify-center items-center p-5 rounded-xl shadow-xl bg-emerald-800 ${transformation} ${opacity} ${className}`}
+      className={
+        "flex flex-col h-96 w-72 gap-3 justify-center items-center p-5 rounded-xl shadow-xl bg-emerald-800"
+      }
     >
       <img
         className="min-w-0 min-h-0 rounded-md shadow-md object-contain border-2 border-white"
