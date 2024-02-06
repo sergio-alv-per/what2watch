@@ -9,7 +9,8 @@ import tmdb_api
 
 app = FastAPI()
 
-origins = ["http://localhost:5173"]  # Vite frontend port
+with open("allowed_origins.txt") as f:
+    origins = f.read().splitlines()
 
 app.add_middleware(
     CORSMiddleware,
