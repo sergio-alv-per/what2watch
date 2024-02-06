@@ -19,6 +19,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# TODO: fix memory management
 app.TMDB_API = tmdb_api.tmdb_api_from_key_file("tmdb.key")
 app.rooms = {}
 app.connections = {}
@@ -67,6 +68,9 @@ def remove_user(room_id: str, user_id: str) -> None:
         raise HTTPException(status_code=404, detail="User not in room")
 
     del app.rooms[room_id][user_id]
+
+    if len(app.rooms[room_id]) == 0:
+        del app.rooms[room_id]
 
 
 def intersect_swipes(d1, d2):
