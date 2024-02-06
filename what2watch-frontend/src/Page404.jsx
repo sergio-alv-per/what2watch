@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react"
 import { useNavigate, Link } from "react-router-dom"
+import { Footer } from "./Footer"
 
 export function Page404() {
   const [timeLeft, setTimeLeft] = useState(5)
@@ -19,9 +20,9 @@ export function Page404() {
 
   return (
     <div className="flex justify-center">
-      <div className="flex flex-col gap-3 items-center min-h-screen max-w-xl pb-5">
+      <div className="flex flex-col justify-between items-center min-h-screen max-w-xl pb-5">
         <Link to="/">
-          <img src="./logo.svg" alt="What2Watch logo" className="p-5 h-24" />
+          <img src="/logo.svg" alt="What2Watch logo" className="p-5 h-24" />
         </Link>
         <h1 className="text-gray-800 font-bold text-3xl">
           404 - Page not found
@@ -35,6 +36,7 @@ export function Page404() {
         <p className="text-gray-800">
           You will be redirected to the home page in {timeLeft} seconds
         </p>
+        <Footer />
       </div>
     </div>
   )

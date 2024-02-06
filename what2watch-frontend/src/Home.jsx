@@ -2,6 +2,7 @@ import { useState } from "react"
 import axios from "axios"
 import { useNavigate, Link } from "react-router-dom"
 import { InfoCarousel } from "./InfoCarousel"
+import { Footer } from "./Footer"
 
 export function Home() {
   const navigate = useNavigate()
@@ -24,9 +25,9 @@ export function Home() {
 
   return (
     <div className="flex justify-center">
-      <div className="flex flex-col gap-3 items-center min-h-screen max-w-xl pb-5">
+      <div className="flex flex-col justify-between items-center min-h-screen max-w-xl pb-5">
         <Link to="/">
-          <img src="./logo.svg" alt="What2Watch logo" className="p-5 h-24" />
+          <img src="/logo.svg" alt="What2Watch logo" className="p-5 h-24" />
         </Link>
         <div className="px-10">
           <InfoCarousel />
@@ -34,6 +35,7 @@ export function Home() {
         <Button onClick={createRoomAndConnect}>Create a room</Button>
         <p className="text-gray-800">or</p>
         <ConnectToRoom connectFunction={connectToRoom} />
+        <Footer />
       </div>
     </div>
   )

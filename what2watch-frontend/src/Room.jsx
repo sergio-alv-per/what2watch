@@ -8,6 +8,7 @@ import {
   FaCheck as Check,
   FaXmark as Cross,
 } from "react-icons/fa6"
+import { Footer } from "./Footer"
 
 export function Room() {
   const [userID, setUserID] = useState(null)
@@ -85,7 +86,7 @@ export function Room() {
 
   return (
     <div className="flex justify-center">
-      <div className="flex flex-col gap-5 items-center min-h-screen max-w-xl pb-5">
+      <div className="flex flex-col justify-between items-center min-h-screen max-w-xl pb-5">
         <div className="flex place-content-between p-2 w-screen max-w-xl">
           <button
             onClick={() => navigate("/")}
@@ -102,6 +103,7 @@ export function Room() {
         ) : (
           <p>Loading...</p>
         )}
+        <Footer />
       </div>
     </div>
   )
