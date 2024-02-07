@@ -1,6 +1,7 @@
 import { useState } from "react"
 import axios from "axios"
 import { useNavigate, Link } from "react-router-dom"
+import { CgSpinner } from "react-icons/cg"
 import { InfoCarousel } from "./InfoCarousel"
 import { Footer } from "./Footer"
 import API from "./API"
@@ -77,18 +78,29 @@ function ConnectToRoom({ connectFunction }) {
   )
 }
 
-function Button({ children, disabled, ...props }) {
+function Button({ children, disabled, onClick, ...props }) {
+  const [loading, setLoading] = useState(false)
   const enabledStyles =
     "bg-emerald-800 text-white rounded-md uppercase font-semibold px-5 py-2"
   const disabledStyles =
     "bg-emerald-800 text-white rounded-md uppercase font-semibold px-5 py-2 opacity-50 cursor-not-allowed"
 
+  const handleClick = (evt) => {
+    setLoading(true)
+    if (onClick) {
+      onClick(evt)
+      setLoading(false)
+    }
+  }
+
   return (
     <button
       className={disabled ? disabledStyles : enabledStyles}
       disabled={disabled}
+      onClick={handleClick}
       {...props}
     >
+      {loading && <CgSpinner className="animate-spin inline-block mr-2" />}
       {children}
     </button>
   )
