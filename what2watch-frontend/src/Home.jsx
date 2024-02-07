@@ -89,7 +89,6 @@ function Button({ children, disabled, onClick, ...props }) {
     setLoading(true)
     if (onClick) {
       onClick(evt)
-      setLoading(false)
     }
   }
 
