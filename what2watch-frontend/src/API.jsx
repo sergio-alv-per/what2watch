@@ -15,6 +15,6 @@ export default class API {
   }
 
   getWSSURLForPath(path) {
-    return "ws://" + this.#baseUrl + path
+    return "wss://" + this.#baseUrl + path
   }
 }
