@@ -1,7 +1,8 @@
 let __instance = null
 
 export default class API {
-  #baseUrl = "what2watch-backend.onrender.com"
+  #baseUrl = import.meta.env.VITE_API_BASE_URL
+  #secure = import.meta.env.VITE_API_SECURE === "true"
 
   static instance() {
     // Singleton
@@ -10,11 +11,13 @@ export default class API {
     return __instance
   }
 
-  getHTTPSURLForPath(path) {
-    return "https://" + this.#baseUrl + path
+  getHTTPURLForPath(path) {
+    const secure = this.#secure ? "s" : ""
+    return "http" + secure + "://" + this.#baseUrl + path
   }
 
-  getWSSURLForPath(path) {
-    return "wss://" + this.#baseUrl + path
+  getWSURLForPath(path) {
+    const secure = this.#secure ? "s" : ""
+    return "ws" + secure + "://" + this.#baseUrl + path
   }
 }

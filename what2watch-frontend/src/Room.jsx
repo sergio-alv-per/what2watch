@@ -23,7 +23,7 @@ export function Room() {
 
       axios
         .post(
-          API.instance().getHTTPSURLForPath(`/rooms/${roomID}/users`),
+          API.instance().getHTTPURLForPath(`/rooms/${roomID}/users`),
           {},
           { signal: abortController.signal }
         )
@@ -47,7 +47,7 @@ export function Room() {
       return () => {
         axios
           .delete(
-            API.instance().getHTTPSURLForPath(`/rooms/${roomID}/users/${userID}`)
+            API.instance().getHTTPURLForPath(`/rooms/${roomID}/users/${userID}`)
           )
           .catch((err) => {
             console.log("Error deleting user: " + err)
@@ -59,7 +59,7 @@ export function Room() {
   useEffect(() => {
     if (userID && roomID) {
       const ws = new WebSocket(
-        API.instance().getWSSURLForPath(`/rooms/${roomID}/users/${userID}/ws`)
+        API.instance().getWSURLForPath(`/rooms/${roomID}/users/${userID}/ws`)
       )
 
       ws.onerror = () => {
@@ -158,7 +158,7 @@ function FilmSwiper({ roomID, userID }) {
 
     axios
       .post(
-        API.instance().getHTTPSURLForPath(
+        API.instance().getHTTPURLForPath(
           `/rooms/${roomID}/users/${userID}/swipes`
         ),
         body,

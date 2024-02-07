@@ -62,7 +62,7 @@ function useFilmPage({ page = 1 }) {
     setLoading(true)
     setError(null)
     axios
-      .get(API.instance().getHTTPSURLForPath(`/films?page=${page}`))
+      .get(API.instance().getHTTPURLForPath(`/films?page=${page}`))
       .then((res) => {
         setFilms(res.data)
         setLoading(false)

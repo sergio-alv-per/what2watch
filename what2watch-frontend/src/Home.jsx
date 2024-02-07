@@ -10,7 +10,7 @@ export function Home() {
 
   const createRoomAndConnect = () => {
     axios
-      .post(API.instance().getHTTPSURLForPath("/rooms"))
+      .post(API.instance().getHTTPURLForPath("/rooms"))
       .then((response) => response.data.id)
       .then((roomID) => {
         navigate(`/rooms/${roomID}`)
